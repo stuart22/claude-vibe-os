@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Testing
+coverage/
+
+# Vibecoding OS — framework files to track
+# NOTE: We intentionally DO track .claude/ files (hooks, skills, settings)
+# because they're part of the project infrastructure.
+# We do NOT track backups (they're ephemeral recovery files).
+.claude/backups/*.md
+!.claude/backups/.gitkeep

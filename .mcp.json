@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "github": {
+      "command": "gh",
+      "args": ["copilot", "mcp"],
+      "description": "GitHub integration for PR and issue management"
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/context7-mcp"],
+      "description": "Live, version-specific documentation lookup"
+    }
+  }
+}
