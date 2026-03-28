@@ -35,13 +35,11 @@ The user is a product manager, not a software engineer. They interact at the pro
 - Their feedback may be stream-of-consciousness (the feedback-triage skill handles this)
 - At natural breakpoints, ask if they want to test ("want me to spin up the dev server so you can test?")
 - When summarizing what you did, describe what changed from the user's perspective, not what files you edited
+- They work across Claude Code CLI (sometimes with worktrees) and IDE environments like Emdash — don't assume a specific tooling setup
 
 ## Living Documentation
 
 This project uses living documentation that you are responsible for maintaining:
-
-### `.claude/current-focus.md`
-Update after completing any significant task, at natural breakpoints, and whenever context usage exceeds 75%. This is the primary recovery mechanism after compaction.
 
 ### `docs/decisions.md`
 **CHECK** before making architectural decisions — look for prior decisions that might be relevant or contradictory. **ADD** new entries when decisions are made. If a new decision contradicts an old one, flag it to the user before proceeding.
@@ -58,33 +56,30 @@ Update when architecture or conventions change materially. Keep it concise — t
 ## Session Workflow
 
 ### Starting a new session
-1. Read `.claude/current-focus.md` to understand current state
-2. If the user names a feature, read `docs/features/{feature}.md`
-3. Check `docs/decisions.md` for relevant prior decisions
-4. Use Plan mode to explore and propose an approach before building
+1. If the user names a feature, read `docs/features/{feature}.md`
+2. Check `docs/decisions.md` for relevant prior decisions
+3. Use `superpowers:brainstorming` before any creative or feature work to explore intent and requirements
+4. For multi-step tasks, use `superpowers:writing-plans` to produce an implementation plan before touching code
 
 ### During work
-5. Build in auto-accept mode after the user approves your plan
-6. Run unit tests as you go (they're your quality gate)
-7. At natural breakpoints, offer to spin up the dev server for testing
-8. If the user provides multi-issue feedback, activate the feedback-triage skill
+5. Build after the user approves your plan
+6. Use `superpowers:test-driven-development` — write tests as you build, not as a separate step
+7. Use `superpowers:dispatching-parallel-agents` when facing 2+ independent tasks
+8. Use `superpowers:systematic-debugging` when hitting bugs or unexpected behavior — diagnose before fixing
+9. At natural breakpoints, offer to spin up the dev server for testing
+10. If the user provides multi-issue feedback, activate the feedback-triage skill
+
+### Before completing work
+11. Use `superpowers:verification-before-completion` before claiming anything is done
+12. Use `superpowers:requesting-code-review` for significant features
+13. Use `superpowers:finishing-a-development-branch` when ready to integrate
 
 ### Wrapping up
-9. Update `.claude/current-focus.md` with current state
-10. Log any new decisions to `docs/decisions.md`
-11. Update this file if architecture or conventions changed
-12. Commit documentation changes alongside code changes
-
-## Context Management
-
-The hooks in `.claude/hooks/` handle context management automatically:
-- **StatusLine** shows context usage percentage with color-coded thresholds
-- At **75%**, consider saving state to `current-focus.md`
-- At **85%**, wrap up the current task and save state
-- At **95%**, compaction is imminent — save everything immediately
-- **PreCompact** hook creates a backup in `.claude/backups/`
-- **SessionStart** hook reinjects context after compaction
-- If recovery files seem insufficient, use `git log` and source files to fill gaps
+When the user signals they're closing the session (e.g., "update docs", "I'm going to close this session", "save context for next time"):
+14. Save a `project`-type memory capturing: what was done this session, what's in progress, open questions, and suggested next steps
+15. Log any new decisions to `docs/decisions.md`
+16. Update this file if architecture or conventions changed
+17. Commit documentation changes alongside code changes
 
 ## Project-Specific Notes
 
