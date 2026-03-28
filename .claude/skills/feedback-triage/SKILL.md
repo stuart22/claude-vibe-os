@@ -81,7 +81,7 @@ Once confirmed, work through the list one at a time:
 - Before each item, briefly state what you're about to do
 - After each item, briefly state what you did
 - After completing a natural group (e.g., all bugs), ask if the user wants to test before continuing
-- Update `current-focus.md` with progress through the list
+- Save progress to a project memory if the list is long and spans multiple steps
 
 ## Important notes
 
