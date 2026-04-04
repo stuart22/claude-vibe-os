@@ -2,6 +2,14 @@
 
 > This is a living document. Claude Code updates it as features are built and test coverage grows.
 
+## Testing Layers
+
+`superpowers:test-driven-development` handles unit/integration tests during implementation. The `quality-gate` skill handles E2E tests and security before completion. Both are required — unit tests verify logic, E2E tests verify the user's experience.
+
+## Visual Validation
+
+The `visual-check` skill uses Playwright MCP to screenshot the running app after UI changes. This is Claude's way of looking at what it built — catching layout bugs, missing content, and broken styling before the PM sees it. This is separate from E2E regression tests: visual-check is for Claude's eyes during development, Playwright test runner is for automated regression.
+
 ## E2E Framework
 
 **Default:** Playwright (`@playwright/test`)
