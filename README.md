@@ -7,12 +7,12 @@ A starter repo for PM-driven development with Claude Code. Clone this template t
 ### 1. Create your project
 Use GitHub's "Use this template" button, or:
 ```bash
-gh repo create my-project --template your-username/vibecoding-template --clone
+gh repo create my-project --template stuart22/claude-vibe-os --clone
 cd my-project
 ```
 
 ### 2. Run product discovery
-Paste the [discovery prompt](https://github.com/your-username/vibecoding-os/blob/main/discovery-prompt.md) into a new claude.ai conversation. Work through the product discovery process.
+Paste the [discovery prompt](discovery-prompt.md) into a new claude.ai conversation. Work through the product discovery process.
 
 ### 3. Drop in discovery docs
 Download the markdown artifacts from claude.ai and place them in `docs/`:
