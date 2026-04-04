@@ -27,6 +27,27 @@ Not yet initialized. See setup process above.
 - Unit tests are your quality gate — run them as you build, not as a separate step
 - Every feature implementation should end in a testable state the user can interact with
 
+## Testing & Security
+
+### Visual Validation
+After implementing any user-visible change, use the `visual-check` skill to verify it looks correct. Don't wait for the user to report visual bugs — catch them yourself by screenshotting the running app with Playwright MCP.
+
+### Regression Testing
+This project uses Playwright for E2E tests in `tests/e2e/`. Every user-facing feature should have at least one E2E test covering the core flow. E2E tests assert on what the user sees (text, visibility, navigation), not implementation details.
+
+The `superpowers:test-driven-development` skill handles unit/integration tests. The `quality-gate` skill handles E2E tests and security. Both are required — unit tests verify logic, E2E tests verify the user's experience.
+
+### Test Validity
+New E2E tests must pass a mutation check: temporarily break the feature, confirm the test fails, restore. This proves the test catches real regressions. The `quality-gate` skill handles this automatically.
+
+### Security
+Three automated hooks enforce security:
+- **Secret guard** — hard-blocks commits containing API keys, tokens, or credentials
+- **Dependency audit** — warns after package installs if vulnerabilities are found
+- **Code scan** — warns on commit if dangerous patterns (XSS, SQLi, eval) are detected
+
+Address Critical findings before completing work. Warnings can be deferred with a note in `docs/decisions.md`.
+
 ## Working with the User
 
 The user is a product manager, not a software engineer. They interact at the product level:
@@ -50,6 +71,9 @@ Update when new subsystems are added, major refactors happen, or component struc
 ### `docs/features/*.md`
 Update when implementation reveals the spec was wrong or incomplete. Don't silently deviate — update the spec so it reflects reality.
 
+### `docs/testing.md`
+Update the coverage map when E2E tests are added or changed. Update security configuration if hooks are modified.
+
 ### This file (CLAUDE.md)
 Update when architecture or conventions change materially. Keep it concise — this file is re-read after every compaction, so every line costs context.
 
@@ -63,23 +87,25 @@ Update when architecture or conventions change materially. Keep it concise — t
 
 ### During work
 5. Build after the user approves your plan
-6. Use `superpowers:test-driven-development` — write tests as you build, not as a separate step
+6. Use `superpowers:test-driven-development` — write tests as you build, not as a separate step. For user-facing features, also plan the E2E test.
 7. Use `superpowers:dispatching-parallel-agents` when facing 2+ independent tasks
 8. Use `superpowers:systematic-debugging` when hitting bugs or unexpected behavior — diagnose before fixing
-9. At natural breakpoints, offer to spin up the dev server for testing
+9. After user-visible changes, use the `visual-check` skill to verify the UI. Then offer to let the user test.
 10. If the user provides multi-issue feedback, activate the feedback-triage skill
 
 ### Before completing work
 11. Use `superpowers:verification-before-completion` before claiming anything is done
-12. Use `superpowers:requesting-code-review` for significant features
-13. Use `superpowers:finishing-a-development-branch` when ready to integrate
+12. Run the `quality-gate` skill (or `/check`) — E2E tests, mutation check, security scan. Address Critical findings.
+13. Use `superpowers:requesting-code-review` for significant features
+14. Use `superpowers:finishing-a-development-branch` when ready to integrate
 
 ### Wrapping up
 When the user signals they're closing the session (e.g., "update docs", "I'm going to close this session", "save context for next time"):
-14. Save a `project`-type memory capturing: what was done this session, what's in progress, open questions, and suggested next steps
-15. Log any new decisions to `docs/decisions.md`
-16. Update this file if architecture or conventions changed
-17. Commit documentation changes alongside code changes
+15. Update `docs/testing.md` coverage map if new E2E tests were added
+16. Save a `project`-type memory capturing: what was done this session, what's in progress, open questions, and suggested next steps
+17. Log any new decisions to `docs/decisions.md`
+18. Update this file if architecture or conventions changed
+19. Commit documentation changes alongside code changes
 
 ## Project-Specific Notes
 

@@ -46,22 +46,29 @@ Project identity and conventions. Tells Claude Code how to work in this project 
 ### Skills (`.claude/skills/`)
 - **feedback-triage** — Organizes messy testing feedback into prioritized issues
 - **design-options** — Generates 2-3 UI alternatives as working prototypes
+- **visual-check** — Screenshots the running app after UI changes to catch visual bugs before you see them
+- **quality-gate** — Runs E2E tests, validates test quality with mutation checks, and scans for security issues
 - **claude-md-upkeep** — Keeps living documentation accurate
 - **context-recovery** — Guides recovery after context compaction
 
 ### Hooks (`.claude/hooks/`)
 - **context-monitor.mjs** — StatusLine showing context usage with threshold warnings
+- **secret-guard.mjs** — Blocks commits containing API keys, tokens, or credentials
+- **dep-audit.mjs** — Warns after dependency installs if vulnerabilities are found
+- **code-scan.mjs** — Warns on commit if dangerous code patterns (XSS, SQLi, eval) are detected
 - **pre-compact-backup.mjs** — Saves structured backup before compaction
 - **session-reinject.sh** — Restores context after compaction
 
 ### Commands (`.claude/commands/`)
 - `/feedback` — Explicitly triggers feedback triage for testing notes
+- `/check` — Runs the full quality gate: E2E tests, test validity, and security scan
 
 ### Docs (`docs/`)
 - Discovery docs (you provide)
 - `decisions.md` — Living decision log (Claude Code maintains)
 - `architecture.md` — System architecture (Claude Code generates)
 - `features/` — Individual feature specs (Claude Code breaks down from features.md)
+- `testing.md` — Test coverage map and security configuration (Claude Code maintains)
 
 ### MCP Servers (`.mcp.json`)
 Pre-configured: GitHub (PR/issue management) + Context7 (live documentation)
@@ -83,5 +90,7 @@ This template is designed for product managers and non-SWEs who build with AI co
 
 - **You work at the product level.** Test the app, provide feedback, make decisions. Claude handles the code.
 - **Context is precious.** Hooks and skills manage the context window so you don't have to manually split sessions.
-- **Documentation stays alive.** CLAUDE.md, decisions.md, and current-focus.md are actively maintained by Claude — not write-once artifacts.
+- **Documentation stays alive.** CLAUDE.md, decisions.md, and testing.md are actively maintained by Claude — not write-once artifacts.
 - **Claude picks the stack.** Discovery docs describe what you're building, not how. Claude Code recommends the technology based on your product needs.
+- **Testing catches real bugs.** E2E tests verify what the user sees, not just what the code does. Mutation checks prove tests are real. Visual validation catches layout bugs before you do.
+- **Security is automatic.** Hooks block secrets, warn about vulnerable dependencies, and flag dangerous code patterns — without you thinking about it.
