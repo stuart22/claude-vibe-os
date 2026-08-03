@@ -24,6 +24,18 @@ Vibecoding OS leans on [Superpowers](https://github.com/obra/superpowers) for th
 /plugin install superpowers@superpowers-marketplace
 ```
 
+The security hooks run on Node.js, which you'll already have if you're building anything web-shaped. Everything else is plain Markdown.
+
+### Staying updated
+
+This is the reason Vibecoding OS is a plugin rather than a repository template: improvements reach projects you've already started, instead of being frozen at the moment you cloned. To pull them in:
+
+```bash
+/plugin update vibe-os
+```
+
+Restart Claude Code afterwards to load the new version.
+
 ## Start a project
 
 In an empty directory:
@@ -82,6 +94,18 @@ Vibecoding OS used to be a repository template you cloned. Projects created that
 3. Keep your `CLAUDE.md` and `docs/` — they're yours. Update skill references to their namespaced names (`vibe-os:quality-gate`, `superpowers:brainstorming`, and so on).
 
 The context-management hooks that shipped with the template — the statusline monitor, pre-compaction backup, and session re-injection — are gone. Claude Code handles compaction natively now.
+
+## Working on the plugin
+
+This repository *is* the plugin, and also the marketplace that serves it. `CLAUDE.md` covers the layout and conventions; `docs/superpowers/specs/` holds the design specs behind larger changes.
+
+To try a local change before pushing it, point a marketplace at your checkout:
+
+```bash
+/plugin marketplace add /absolute/path/to/claude-vibe-os
+```
+
+Two things worth knowing if you contribute: security patterns belong in `hooks/patterns.mjs` only — both the commit-time hooks and the scanner that `quality-gate` runs import from there, so adding a pattern anywhere else means the two can disagree. And instructions should carry policy rather than procedure: the decisions and gates a model can't infer, not command incantations or checklists it already knows. That's what keeps these skills useful as models improve.
 
 ## License
 
