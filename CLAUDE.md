@@ -1,64 +1,29 @@
-# Project: [PROJECT NAME]
+# Vibecoding OS — plugin repository
 
-> This file is re-read every turn — keep it concise. Rules and pointers live here; detailed process belongs in skills, docs/, and feature specs. When architecture, conventions, or project context changes, update any of those docs as needed.
+> Re-read every turn — keep it short.
 
-## Project Overview
+This repo *is* the `vibe-os` Claude Code plugin, and also the marketplace that serves it. It contains no application code.
 
-This project has not been initialized yet. Run the setup process:
-1. Read all documents in `docs/` (vision.md, features.md, and any others present)
-2. Recommend a tech stack with rationale based on the technical implications in the docs
-3. After user approval, generate `docs/architecture.md`
-4. Break `docs/features.md` into individual files in `docs/features/`, each scoped to roughly one session of work, ordered by dependency
-5. Initialize `docs/decisions.md` with the tech stack decision
-6. Scaffold the codebase (project init, dependencies, folder structure, base config)
-7. Replace this section with actual project context
+## Layout
 
-## Architecture
+- `.claude-plugin/plugin.json` — plugin manifest. Bump `version` on every user-visible change.
+- `.claude-plugin/marketplace.json` — marketplace listing, `source: "./"` (the repo is the plugin).
+- `skills/` — one directory per skill, each with `SKILL.md`. `vibe-init` also bundles `discovery-interview.md` and `templates/`.
+- `commands/` — thin pointers to skills. Never restate a skill's process here; it drifts.
+- `hooks/` — `hooks.json` wires the scripts. All security patterns live in `patterns.mjs` and are imported by both the commit-time hooks and `scan.mjs`, which `quality-gate` runs. Add patterns there only.
 
-Not yet initialized. See setup process above.
+## Writing instructions here
 
-## Coding Conventions
+The audience is a current-generation model, so write **policy, not procedure**: the decisions, gates, and priorities it can't infer. Leave out command incantations, regex listings, output templates, and generic checklists — those age badly and cost tokens every load. If an instruction only restates what a capable model would already do, delete it.
 
-- Follow the patterns established in the codebase — consistency over personal preference
-- Unit tests are your quality gate — run them as you build, not as a separate step
-- Every feature implementation should end in a testable state the user can interact with
+Keep the two audiences straight: skills in `skills/` instruct Claude, while `skills/vibe-init/templates/CLAUDE.md` is generated *into the user's project* and must read as that project's own instructions.
 
-## Testing & Security
+## Conventions
 
-- After UI changes, use `visual-check` skill to screenshot and verify before showing the user
-- Every user-facing feature needs an E2E test in `tests/e2e/` — assert on what the user sees, not implementation details
-- `superpowers:test-driven-development` for unit tests; `quality-gate` for E2E + security
-- New E2E tests must pass mutation check (quality-gate handles this automatically)
-- Security hooks run automatically: secrets blocked on commit, dep vulnerabilities warned on install, dangerous code patterns warned on commit
-- Address Critical security findings before completing. Defer Warnings with a note in `docs/decisions.md`
-- See `docs/testing.md` for framework config, coverage map, and test commands
+- Hooks fail open (`exit 0`) on any error. Only `secret-guard` and `rm-guard` block, and only on genuine matches.
+- Skills reference each other by namespaced name: `vibe-os:quality-gate`, `superpowers:brainstorming`.
+- Superpowers is a soft dependency — reference its skills by name, never copy their content, so their updates flow through automatically.
 
-## Working with the User
+## Testing a change
 
-The user is a product manager, not a software engineer. They interact at the product level:
-- They don't read code — explain decisions in product terms, not implementation terms
-- Their feedback may be stream-of-consciousness (the feedback-triage skill handles this)
-- When summarizing what you did, describe what changed from the user's perspective, not what files you edited
-- At natural breakpoints, offer to let them test the running app
-
-## Living Docs
-
-You maintain these — check before decisions, update after changes:
-- `docs/decisions.md` — check before architectural decisions, add entries after. Flag contradictions.
-- `docs/architecture.md` — update on subsystem/structural changes
-- `docs/features/*.md` — update when implementation diverges from spec. Don't silently deviate.
-- `docs/testing.md` — update coverage map when E2E tests change
-
-## Session Workflow
-
-**Start:** Read `docs/features/{feature}.md` + `docs/decisions.md`. Use `superpowers:brainstorming` before creative work, `superpowers:writing-plans` for multi-step tasks.
-
-**Build:** `superpowers:test-driven-development` as you go (include E2E for user-facing features). `visual-check` after UI changes. `superpowers:dispatching-parallel-agents` for independent tasks. `superpowers:systematic-debugging` for bugs. `feedback-triage` for multi-issue feedback.
-
-**Complete:** `superpowers:verification-before-completion` → `quality-gate` (or `/check`) → `superpowers:requesting-code-review` for major features → `superpowers:finishing-a-development-branch`.
-
-**Wrap up:** Update `docs/testing.md` coverage map, save project memory, log decisions to `docs/decisions.md`, update this file if needed, commit docs with code.
-
-## Project-Specific Notes
-
-<!-- Add as the project evolves -->
+Install the local checkout as a marketplace and exercise the affected surface — trip the hook, run the skill — before pushing. `docs/superpowers/specs/` holds the design specs behind larger changes.
