@@ -1,96 +1,88 @@
-# Vibecoding OS — Project Template
+# Vibecoding OS
 
-A starter repo for PM-driven development with Claude Code. Clone this template to bootstrap any new project with context management, living documentation, and product workflow automation pre-wired.
+A Claude Code plugin for building software when you're a product manager, not an engineer.
 
-## Quick Start
+It scaffolds new projects from a product discovery conversation, keeps documentation alive as the project grows, turns your messy testing notes into ordered work, and refuses to let Claude call something "done" without proving it.
 
-### 1. Create your project
-Use GitHub's "Use this template" button, or:
+## Install
+
 ```bash
-gh repo create my-project --template stuart22/claude-vibe-os --clone
-cd my-project
+/plugin marketplace add stuart22/claude-vibe-os
 ```
 
-### 2. Run product discovery
-Paste the [discovery prompt](discovery-prompt.md) into a new claude.ai conversation. Work through the product discovery process.
-
-### 3. Drop in discovery docs
-Download the markdown artifacts from claude.ai and place them in `docs/`:
-```
-docs/
-├── vision.md              ← required
-├── features.md            ← required
-├── personas-and-flows.md  ← optional (smaller projects may skip)
-└── ux-direction.md        ← optional (smaller projects may skip)
+```bash
+/plugin install vibe-os@claude-vibe-os
 ```
 
-### 4. Initialize with Claude Code
-Open Claude Code in the project directory and say:
-```
-read the docs and set up this project
-```
+Vibecoding OS leans on [Superpowers](https://github.com/obra/superpowers) for the engineering workflow underneath it — brainstorming, planning, TDD, debugging, code review. Install it too:
 
-Claude Code will read your discovery documents, recommend a tech stack, scaffold the codebase, and wire everything up. No feature code yet — just foundation.
-
-### 5. Build
-Start building features:
-```
-let's work on [feature name]
-```
-
-## What's Included
-
-### CLAUDE.md
-Project identity and conventions. Tells Claude Code how to work in this project — session workflow, documentation rules, user interaction patterns. Evolves as the project grows.
-
-### Skills (`.claude/skills/`)
-- **feedback-triage** — Organizes messy testing feedback into prioritized issues
-- **design-options** — Generates 2-3 UI alternatives as working prototypes
-- **visual-check** — Screenshots the running app after UI changes to catch visual bugs before you see them
-- **quality-gate** — Runs E2E tests, validates test quality with mutation checks, and scans for security issues
-- **claude-md-upkeep** — Keeps living documentation accurate
-- **context-recovery** — Guides recovery after context compaction
-
-### Hooks (`.claude/hooks/`)
-- **context-monitor.mjs** — StatusLine showing context usage with threshold warnings
-- **secret-guard.mjs** — Blocks commits containing API keys, tokens, or credentials
-- **dep-audit.mjs** — Warns after dependency installs if vulnerabilities are found
-- **code-scan.mjs** — Warns on commit if dangerous code patterns (XSS, SQLi, eval) are detected
-- **pre-compact-backup.mjs** — Saves structured backup before compaction
-- **session-reinject.sh** — Restores context after compaction
-
-### Commands (`.claude/commands/`)
-- `/feedback` — Explicitly triggers feedback triage for testing notes
-- `/check` — Runs the full quality gate: E2E tests, test validity, and security scan
-
-### Docs (`docs/`)
-- Discovery docs (you provide)
-- `decisions.md` — Living decision log (Claude Code maintains)
-- `architecture.md` — System architecture (Claude Code generates)
-- `features/` — Individual feature specs (Claude Code breaks down from features.md)
-- `testing.md` — Test coverage map and security configuration (Claude Code maintains)
-
-### MCP Servers (`.mcp.json`)
-Pre-configured: GitHub (PR/issue management) + Context7 (live documentation)
-
-## Recommended Companion Plugins
-
-Install these globally for best results:
-```
+```bash
 /plugin marketplace add obra/superpowers-marketplace
+```
+
+```bash
 /plugin install superpowers@superpowers-marketplace
 ```
 
-- **Superpowers** — Engineering workflow (brainstorm→plan→execute, TDD, code review)
-- **frontend-design** — Production-grade UI quality
+## Start a project
+
+In an empty directory:
+
+```
+set up a new project
+```
+
+That runs `vibe-init`, which will:
+
+1. Interview you about what you're building — the problem, the users, the core loop, the features, how it should feel. It pushes back rather than just transcribing.
+2. Write your discovery documents into `docs/`.
+3. Recommend a tech stack, explained in product terms, and wait for your approval.
+4. Generate the living docs — architecture, decisions log, testing map — and a `CLAUDE.md` tuned to your project.
+5. Split your features into individual specs in dependency order.
+6. Scaffold the codebase and confirm it runs.
+
+No feature code — just the foundation. Then:
+
+```
+let's work on [first feature]
+```
+
+If you'd rather do discovery elsewhere (a claude.ai conversation, for instance), drop `vision.md` and `features.md` into `docs/` first and `vibe-init` will pick up from there.
+
+## What you get
+
+**Skills**
+
+| | |
+|---|---|
+| `vibe-init` | Discovery interview, stack decision, living docs, and codebase scaffold |
+| `feedback-triage` | Turns stream-of-consciousness testing notes into a prioritized list — blocking bugs first, cosmetics last — and confirms the order before touching code |
+| `design-options` | Builds 2-3 genuinely different working UI alternatives you can click through, then cleans up the losers |
+| `visual-check` | Screenshots the running app after UI changes so Claude sees layout bugs before you do |
+| `quality-gate` | E2E tests, a mutation check that proves those tests actually fail when the feature breaks, and a security scan |
+
+**Commands** — `/check` runs the quality gate. `/feedback` triages testing notes.
+
+**Hooks** — secrets are blocked at commit time, dangerous code patterns (XSS, SQL injection, `eval`) are flagged at commit time, dependency installs are audited for known vulnerabilities, and recursive deletes aimed at your project root or home directory are blocked. These run in every project while the plugin is enabled; disable it per-project if you don't want that.
 
 ## Philosophy
 
-This template is designed for product managers and non-SWEs who build with AI coding assistants. The core principles:
+- **You work at the product level.** Test the app, give feedback, make decisions. Claude handles the code.
+- **Documentation stays alive.** The decisions log, architecture, and test coverage map are maintained as the project changes, not written once and abandoned.
+- **Claude picks the stack.** Your discovery docs describe what you're building, not how.
+- **"Done" has to be proven.** A test that passes whether or not the feature works is worse than no test, so the quality gate breaks each new test on purpose to check that it notices.
+- **Security is automatic.** The hooks run whether or not anyone remembered to think about it.
 
-- **You work at the product level.** Test the app, provide feedback, make decisions. Claude handles the code.
-- **Context is precious.** Hooks and skills manage the context window so you don't have to manually split sessions.
-- **Documentation stays alive.** CLAUDE.md, decisions.md, and testing.md are actively maintained by Claude — not write-once artifacts.
-- **Claude picks the stack.** Discovery docs describe what you're building, not how. Claude Code recommends the technology based on your product needs.
-- **Testing catches real bugs.** E2E tests verify what the user sees, not just what the code does. Mutation checks prove tests are real. Visual validation catches layout bugs before you do.
-- **Security is automatic.** Hooks block secrets, warn about vulnerable dependencies, and flag dangerous code patterns — without you thinking about it.
+## Migrating from the template
+
+Vibecoding OS used to be a repository template you cloned. Projects created that way keep working untouched. To move one onto the plugin:
+
+1. Install the plugin as above.
+2. Delete `.claude/skills/`, `.claude/hooks/`, and `.claude/commands/` from the project, along with the `hooks` and `StatusLine` blocks in `.claude/settings.json`.
+3. Keep your `CLAUDE.md` and `docs/` — they're yours. Update skill references to their namespaced names (`vibe-os:quality-gate`, `superpowers:brainstorming`, and so on).
+
+The context-management hooks that shipped with the template — the statusline monitor, pre-compaction backup, and session re-injection — are gone. Claude Code handles compaction natively now.
+
+## License
+
+MIT

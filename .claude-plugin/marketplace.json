@@ -1,0 +1,21 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "claude-vibe-os",
+  "description": "Vibecoding OS — a product-manager-driven development workflow for Claude Code",
+  "owner": {
+    "name": "Stuart Hall",
+    "email": "stuart22@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "vibe-os",
+      "description": "Product-manager-driven development workflow: project scaffolding from discovery docs, feedback triage, design options, visual checks, and a quality gate with E2E and security scanning",
+      "author": {
+        "name": "Stuart Hall"
+      },
+      "category": "workflow",
+      "source": "./",
+      "homepage": "https://github.com/stuart22/claude-vibe-os"
+    }
+  ]
+}

@@ -163,3 +163,30 @@ companion install, migration note, philosophy (trimmed).
    instructions still produce the expected behavior (triage ordering, mutation
    check, screenshot-before-presenting, option switcher).
 5. README accuracy pass: every named skill/hook/command exists.
+
+## Implementation notes
+
+Where the build differed from this design, and why:
+
+- **Pattern single-sourcing needed a shared module.** The design said quality-gate
+  would run the hook scripts directly, but those scripts read a hook payload from
+  stdin and gate on the tool command — running them from a skill would hang. The
+  patterns and helpers moved to `hooks/patterns.mjs`, imported by the three
+  commit-time hooks and by a new `hooks/scan.mjs` CLI that quality-gate calls.
+- **`scan.mjs --since <ref>`** was added. Scanning only uncommitted changes misses
+  work already committed on a feature branch, which is the common case at
+  completion time. It also handles a repo with no commits (scans staged content)
+  and a non-git directory.
+- **The `rm -rf` blocker became `hooks/rm-guard.mjs`.** The inline settings.json
+  version required `jq`; a script has no external dependency. Its matching was
+  also tightened — the original blocked `rm -rf ./build` and would have blocked
+  `git rm -r --cached .`; both are now allowed, while `/`, `~`, `$HOME`, and `.`
+  targets are still blocked. Covered by unit tests over 18 command forms.
+- **Added `LICENSE`** (MIT, as both manifests declare) and a maintainer-facing
+  root `CLAUDE.md` describing how to work on the plugin itself.
+- **Reduction achieved: 49%**, against a 60% target — measured across the four
+  carried-over skills, both commands, and the project CLAUDE.md (3842 → 1959
+  words). The remainder is policy that still earns its place.
+- **Not verified:** hooks firing inside a live session. The scripts were tested
+  directly with representative hook payloads, and `claude plugin details` confirms
+  both hook events register.
