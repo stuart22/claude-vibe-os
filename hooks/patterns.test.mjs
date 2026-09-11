@@ -1,4 +1,4 @@
-// node --test hooks/
+// node --test hooks/*.test.mjs
 // Corpus: every line the secret-guard hook blocked across ~/.claude/projects
 // transcripts up to 2026-09-11 (148 blocks, 17 sessions, zero real secrets).
 import { test } from 'node:test';
@@ -47,6 +47,9 @@ const TRUE_POSITIVES = [
   kv('aws_access_key_id', 'AKIA' + 'IOSFODNN7REALKEY'),
   kv('GITHUB_TOKEN', 'ghp_' + 'A1b2C3d4E5f6G7h8I9j0K1l2M3n4O5p6Q7r8S9t0'),
   '+-----BEGIN RSA ' + 'PRIVATE KEY-----',
+  '+PASSWORD=$PW TOKEN=' + 'abc12345def67890',            // literal after a variable reference
+  kv('STRIPE_SECRET_KEY', 'sk_test_' + '51H8f9K2l3M4n5O6p7Q8r9S0'), // "test" inside a real key
+  '+{password:' + 'hunter2hunter2}',                       // compact object literal
 ];
 
 test('does not flag variable references, code, paths, prose, or documented example keys', () => {

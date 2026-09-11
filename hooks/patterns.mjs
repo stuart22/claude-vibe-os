@@ -10,7 +10,7 @@ import { execSync } from 'child_process';
 
 /**
  * Every pattern is tested against one added line. `pattern` finds a candidate;
- * an optional `value` extractor hands the captured value to looksLikeSecretValue,
+ * an optional `value(match, line)` extractor hands the text after each match to looksLikeSecretValue,
  * which rejects variable references, code, paths, prose and placeholders. Without
  * a value check the generic rule fired on `token=$PUSHOVER_TOKEN`,
  * `api_key: os.environ/KEY`, `TOKEN = r"(?<!\S)…"` and a comment saying
@@ -21,8 +21,8 @@ export const SECRET_PATTERNS = [
   { name: 'Private Key', pattern: /-----BEGIN[A-Z ]*PRIVATE KEY-----/ },
   {
     name: 'Generic Secret',
-    pattern: /(API_KEY|API_SECRET|SECRET_KEY|SECRET|TOKEN|PASSWORD|PRIVATE_KEY|ACCESS_KEY)\s*[=:]\s*(.+)$/i,
-    value: m => m[2],
+    pattern: /(API_KEY|API_SECRET|SECRET_KEY|SECRET|TOKEN|PASSWORD|PRIVATE_KEY|ACCESS_KEY)\s*[=:]\s*/gi,
+    value: (m, line) => line.slice(m.index + m[0].length),
   },
   { name: 'GitHub Token', pattern: /gh[pousr]_[A-Za-z0-9_]{36,}/ },
 ];
@@ -50,13 +50,13 @@ export function looksLikeSecretValue(raw) {
     const end = v.indexOf(quote);
     if (end !== -1) v = v.slice(0, end);
   } else {
-    v = v.split(/[\s;,)]/)[0];
+    v = v.split(/[\s;,)}\]]/)[0];
   }
   if (v.length < 8) return false;
   if (/^[$%{<(\[\/~.]/.test(v)) return false;               // $VAR, ${VAR}, %filtered%, <placeholder>, paths
   if (!/^[A-Za-z0-9_\-.+\/=]+$/.test(v)) return false;       // an expression or prose, not one token
   if (/^\w+:\/\//.test(v)) return false;                     // URL
-  if (/example|sample|placeholder|change[_-]?me|your[_-]|xxx|dummy|fake|filtered|redacted|test|token|secret|password/i.test(v)) return false;
+  if (/\b(example|sample|placeholder|change[_-]?me|your|dummy|fake|filtered|redacted|test|token|secret|password)\b|xxx/i.test(v)) return false;
   if (/^[A-Z][A-Z0-9_]*$/.test(v)) return false;             // CONSTANT_NAME
   if (/^[A-Za-z_]\w*([.\/][A-Za-z_]\w*)+$/.test(v)) return false; // os.environ/KEY, settings.SECRET_KEY
   if (!/\d/.test(v) && !(/[a-z]/.test(v) && /[A-Z]/.test(v)) && v.length < 20) return false; // a plain word
@@ -234,10 +234,10 @@ export function findSecrets(lines, files = []) {
 
   for (const { name, pattern, value } of SECRET_PATTERNS) {
     const hit = lines.find(line => {
-      const m = pattern.exec(line);
-      if (!m) return false;
       if (KNOWN_EXAMPLE_SECRETS.some(k => line.includes(k))) return false;
-      return value ? looksLikeSecretValue(value(m)) : true;
+      if (!value) return pattern.test(line);
+      // Every KEY= on the line gets its own look: a literal after a $VAR still counts.
+      return [...line.matchAll(pattern)].some(m => looksLikeSecretValue(value(m, line)));
     });
     if (hit) {
       const excerpt = hit.replace(/^\+/, '').slice(0, 80);
