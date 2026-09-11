@@ -26,4 +26,4 @@ Keep the two audiences straight: skills in `skills/` instruct Claude, while `ski
 
 ## Testing a change
 
-Install the local checkout as a marketplace and exercise the affected surface — trip the hook, run the skill — before pushing. `docs/superpowers/specs/` holds the design specs behind larger changes.
+Run `node --test hooks/*.test.mjs` (the secret-guard corpus lives in `hooks/patterns.test.mjs`; add every new false positive there first). Then install the local checkout as a marketplace and exercise the affected surface — trip the hook, run the skill — before pushing. `docs/superpowers/specs/` holds the design specs behind larger changes.
